@@ -20768,6 +20768,205 @@ module.exports = traverseAllChildren;
 module.exports = require('./lib/React');
 
 },{"./lib/React":158}],182:[function(require,module,exports){
+var React = require("react");
+var DisplayText = require("./DisplayText.jsx");
+
+class CenterContainer extends React.Component {
+    // componentWillMount() { 
+    //     var data = this.props.heading.split('?');
+
+    //     this.setState({ heading: data[0] });
+
+    //     data = this.props.label.split('?');
+    //     this.setState({ label: data[0] });
+    // }
+
+    render() {
+        var baseContainerStyle = {
+            position: 'relative',
+            height: '250px',
+            background: this.props.baseBackgroundColor || '#ffffff',
+            width: '100%',
+            margin: '30px 0px',
+            border: '1px solid',
+            borderColor: '#E1E2E3',
+            borderRadius: '3px'
+        },
+            innerContainerStyle = {
+            position: 'absolute',
+            background: this.props.bottomPanelColor || '#484D4D',
+            borderRadius: '0px 0px 3px 3px',
+            bottom: '0',
+            width: '100%',
+            height: '25%'
+        },
+            dispalyContainerStyle = {
+            position: 'relative',
+            height: '62px'
+        },
+            header = this.props.heading.split('|'),
+            label = this.props.label.split('|'),
+            headerText = header[0].split('?'),
+            headerStyle = header[1],
+            labelText = label[0].split('?'),
+            labelStyle = label[1],
+            displayCompArray = [];
+
+        for (var i = 0; i < headerText.length; i++) {
+            displayCompArray.push({
+                header: headerText[i],
+                label: labelText[i]
+            });
+        }
+
+        var createDisplayItem = function (data, index) {
+            return React.createElement(
+                "div",
+                { key: index, className: "text-center col-xs-4 col-sm-4", style: dispalyContainerStyle },
+                React.createElement(DisplayText, {
+                    heading: data.header + "|" + headerStyle,
+                    label: data.label + "|" + labelStyle,
+                    position: "bothCenter",
+                    fontStyle: "#ffffff|#B1B2B2"
+                })
+            );
+        };
+
+        return React.createElement(
+            "div",
+            { style: baseContainerStyle },
+            React.createElement(
+                "div",
+                { style: innerContainerStyle },
+                React.createElement(
+                    "div",
+                    { className: "row" },
+                    displayCompArray.map(createDisplayItem)
+                )
+            )
+        );
+    }
+};
+
+module.exports = CenterContainer;
+
+},{"./DisplayText.jsx":183,"react":181}],183:[function(require,module,exports){
+var React = require('react');
+class DisplayText extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    componentWillMount() {
+        var data = this.props.heading.split('|');
+
+        this.setState({ headingText: data[0] });
+        this.setState({ headingClass: data[1] });
+
+        data = this.props.label.split('|');
+        this.setState({ labelText: data[0] });
+        this.setState({ labelClass: data[1] });
+    }
+    render() {
+        var contentColor = {},
+            positionStyle = {},
+            headingColor = { color: '#656565' },
+            labelColor = { color: '#B1B2B2' },
+            temperatureTileStyle = {
+            fontWeight: 'lighter',
+            fontSize: '30px'
+        };
+        if (this.props.fontStyle) {
+            if (this.props.fontStyle === "#ffffff") {
+                headingColor.color = this.props.fontStyle;
+                labelColor.color = this.props.fontStyle;
+            } else {
+                headingColor.color = this.props.fontStyle.split('|')[0];
+                labelColor.color = this.props.fontStyle.split('|')[1];
+            }
+        }
+        switch (this.props.position) {
+            case 'bothCenter':
+                positionStyle = {
+                    position: 'absolute',
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translate(-50%,-50%)'
+                };
+                break;
+            case 'verticalCenter':
+                positionStyle = {
+                    position: 'absolute',
+                    top: '50%',
+                    transform: 'translateY(-50%)'
+                };
+                break;
+            case 'horizontalCenter':
+                positionStyle = {
+                    position: 'absolute',
+                    left: '50%',
+                    transform: 'translateX(-50%)'
+                };
+                break;
+            default:
+        }
+
+        return React.createElement(
+            'div',
+            { style: Object.assign(contentColor, positionStyle) },
+            React.createElement(
+                'div',
+                { className: this.state.headingClass, style: this.props.isTemperatureTile ? Object.assign(headingColor, temperatureTileStyle) : headingColor },
+                this.state.headingText
+            ),
+            React.createElement(
+                'div',
+                { className: this.state.labelClass, style: labelColor },
+                this.state.labelText
+            )
+        );
+    }
+};
+
+module.exports = DisplayText;
+
+},{"react":181}],184:[function(require,module,exports){
+var React = require("react");
+var DisplayText = require("./DisplayText.jsx");
+class HeaderTile extends React.Component {
+    render() {
+        var fontStyle = "",
+            headerTileStyle = {
+            border: '1px solid',
+            borderColor: this.props.tileBorder || '#E1E2E3',
+            height: '150px',
+            padding: '0px 10px',
+            margin: '10px 0px',
+            backgroundColor: this.props.tileBackground || 'white',
+            position: 'relative',
+            borderRadius: '3px'
+        };
+
+        if (this.props.tileBackground) {
+            fontStyle = '#ffffff';
+        }
+
+        return React.createElement(
+            "div",
+            { style: headerTileStyle },
+            React.createElement(DisplayText, {
+                heading: this.props.heading,
+                label: this.props.label,
+                position: this.props.position,
+                fontStyle: fontStyle,
+                isTemperatureTile: this.props.isTemperatureTile || false
+            })
+        );
+    }
+};
+
+module.exports = HeaderTile;
+
+},{"./DisplayText.jsx":183,"react":181}],185:[function(require,module,exports){
 var React = require('react');
 var ListItem = require('./ListItem.jsx');
 
@@ -20790,7 +20989,7 @@ var List = React.createClass({
 
 module.exports = List;
 
-},{"./ListItem.jsx":183,"react":181}],183:[function(require,module,exports){
+},{"./ListItem.jsx":186,"react":181}],186:[function(require,module,exports){
 var React = require('react');
 var ListItem = React.createClass({
   displayName: 'ListItem',
@@ -20810,11 +21009,117 @@ var ListItem = React.createClass({
 
 module.exports = ListItem;
 
-},{"react":181}],184:[function(require,module,exports){
+},{"react":181}],187:[function(require,module,exports){
+var React = require('react');
+var DisplayText = require('./DisplayText.jsx');
+
+class RightSideContainer extends React.Component {
+    render() {
+        var baseContainerStyle = {
+            height: '150px',
+            background: this.props.baseBackgroundColor || '#ffffff',
+            width: '100%',
+            margin: '15px 0px',
+            border: '1px solid',
+            borderColor: '#E1E2E3',
+            borderRadius: '3px'
+        },
+            innerContainerStyle = {
+            position: 'relative',
+            height: '50%',
+            padding: '0px 10px',
+            background: this.props.titleColor || '#000000',
+            borderRadius: '3px 3px 0px 0px'
+        };
+        return React.createElement(
+            'div',
+            { style: baseContainerStyle },
+            React.createElement(
+                'div',
+                { style: innerContainerStyle },
+                React.createElement(DisplayText, {
+                    heading: this.props.heading,
+                    label: this.props.label,
+                    position: 'verticalCenter',
+                    fontStyle: '#ffffff'
+                })
+            )
+        );
+    }
+};
+
+module.exports = RightSideContainer;
+
+},{"./DisplayText.jsx":183,"react":181}],188:[function(require,module,exports){
 var React = require("react");
 var ReactDom = require("react-dom");
+var HeaderTile = require("./components/HeaderTile.jsx");
+var CenterContainer = require("./components/CenterContainer.jsx");
+var RightSideContainer = require("./components/RightSideContainer.jsx");
 var List = require("./components/List.jsx");
 
-ReactDom.render(React.createElement(List, null), document.getElementById("ingredients"));
+ReactDom.render(React.createElement(HeaderTile, {
+    heading: "21|headar",
+    label: "New follower add this month|label-headar",
+    position: "verticalCenter"
+}), document.getElementById("header_container_1"));
 
-},{"./components/List.jsx":182,"react":181,"react-dom":30}]},{},[184]);
+ReactDom.render(React.createElement(HeaderTile, {
+    heading: "$ 1250|headar",
+    label: "Average Monthly Income|label-headar",
+    position: "verticalCenter"
+}), document.getElementById("header_container_2"));
+
+ReactDom.render(React.createElement(HeaderTile, {
+    heading: "$ 13865|headar",
+    label: "Yearly Income Goal|label-headar",
+    position: "verticalCenter"
+}), document.getElementById("header_container_3"));
+
+ReactDom.render(React.createElement(HeaderTile, {
+    tileBackground: "#FF8A00",
+    heading: "18\xB0|headar",
+    label: "Paris|label-headar",
+    position: "bothCenter",
+    isTemperatureTile: "true"
+}), document.getElementById("header_container_4"));
+
+ReactDom.render(React.createElement(CenterContainer, {
+    baseBackgroundColor: "#0096D0",
+    heading: "15080?12000?5100|headar",
+    label: "Shot View?Likes?Comments|label-headar",
+    position: "bothCenter"
+}), document.getElementById("sub_container_1"));
+
+ReactDom.render(React.createElement(CenterContainer, {
+    baseBackgroundColor: "#CD59AE",
+    heading: "15080?12000?5100|headar",
+    label: "Shot View?Likes?Comments|label-headar",
+    position: "bothCenter"
+}), document.getElementById("sub_container_2"));
+
+ReactDom.render(React.createElement(RightSideContainer, {
+    titleColor: "#0096D0",
+    heading: "New Visitor|label-headar",
+    label: "1.5K|headar"
+}), document.getElementById("side_left_container_1"));
+
+ReactDom.render(React.createElement(RightSideContainer, {
+    titleColor: "#B28AD6",
+    heading: "Bounce Rate|label-headar",
+    label: "50%|headar"
+}), document.getElementById("side_left_container_2"));
+
+ReactDom.render(React.createElement(RightSideContainer, {
+    titleColor: "#FF4826",
+    heading: "Searchs|label-headar",
+    label: "28%|headar"
+}), document.getElementById("side_left_container_3"));
+
+ReactDom.render(React.createElement(RightSideContainer, {
+    titleColor: "#63C254",
+    heading: "Traffic|label-headar",
+    label: "140.5 kb|headar"
+}), document.getElementById("side_left_container_4"));
+
+},{"./components/CenterContainer.jsx":182,"./components/HeaderTile.jsx":184,"./components/List.jsx":185,"./components/RightSideContainer.jsx":187,"react":181,"react-dom":30}]},{},[188]);
